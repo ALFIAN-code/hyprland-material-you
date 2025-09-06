@@ -26,7 +26,9 @@ noanim_layers = [
 
 BLUR = """
 decoration {{
+    dim_special = 0.5
     blur {{
+        special = true
         enabled = true
         xray = {}
     }}
