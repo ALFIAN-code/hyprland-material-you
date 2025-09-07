@@ -100,7 +100,7 @@ key_binds = (
         ("resizeactive", "0 30")
     ),
     KeyBind(
-        (main_mod, "S"),
+        (main_mod, "G"),
         "togglegroup",
         "Toggle group",
         Category.WINDOWS
