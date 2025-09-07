@@ -65,12 +65,6 @@ HyprYou (hyprland-material-you v2). It aims to provide a modern, feature-rich, a
 </details>
 <details>
     <summary>Automatic installation</summary>
-
-- **Pre-built:**
-  - Install needed packages from [releases](https://github.com/koeqaife/hyprland-material-you/releases)
-  - Use `sudo pacman -U <file name>` change `<file name>` to name of the package you downloaded and make sure you're in Downloads folder
-    > Yea some people were trying to use `pacman -U` in home folder so I had to say that
-
 - **Build manually:**
   - `hypryou` - Use `makepkg -si`
   - `hypryou-greeter` - Use `makepkg -si` in `greeter/`
