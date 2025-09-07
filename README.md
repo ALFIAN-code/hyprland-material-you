@@ -65,6 +65,7 @@ HyprYou (hyprland-material-you v2). It aims to provide a modern, feature-rich, a
 </details>
 <details>
     <summary>Automatic installation</summary>
+    
 **Build manually:**
   - `hypryou` - Use `makepkg -si`
   - `hypryou-greeter` - Use `makepkg -si` in `greeter/`
