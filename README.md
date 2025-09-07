@@ -49,7 +49,8 @@ HyprYou (hyprland-material-you v2). It aims to provide a modern, feature-rich, a
 
 <details>
     <summary>Manual installation</summary>
-
+    
+- Install chaotic aur first, <https://aur.chaotic.cx/>
 - Clone repository: `git clone --depth=1 https://github.com/koeqaife/hyprland-material-you.git`
 - Install all dependencies from depends.txt
 - Build Cython code by using `build.sh` in `hypryou/`
@@ -66,6 +67,9 @@ HyprYou (hyprland-material-you v2). It aims to provide a modern, feature-rich, a
 <details>
     <summary>Automatic installation</summary>
     
+  - Install chaotic aur first, <https://aur.chaotic.cx/>
+ <br> then : <br>
+
 **Build manually:**
   - `hypryou` - Use `makepkg -si`
   - `hypryou-greeter` - Use `makepkg -si` in `greeter/`
