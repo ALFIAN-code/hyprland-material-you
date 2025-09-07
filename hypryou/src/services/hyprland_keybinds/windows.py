@@ -50,23 +50,57 @@ key_binds = (
         "resizewindow"
     ),
     KeyBind(
+        (main_mod, "left"),
+        ("movefocus", "l")
+    ),
+    KeyBind(
+        (main_mod, "right"),
+        ("movefocus", "r")
+    ),
+    KeyBind(
+        (main_mod, "up"),
+        ("movefocus", "u")
+    ),
+    KeyBind(
+        (main_mod, "down"),
+        ("movefocus", "d")
+    ),
+
+    KeyBind(
         (main_mod, "SHIFT", "right"),
-        ("resizeactive", "100 0")
+        ("movewindow", "r")
     ),
     KeyBind(
         (main_mod, "SHIFT", "left"),
-        ("resizeactive", "-100 0")
+        ("movewindow", "l")
     ),
     KeyBind(
         (main_mod, "SHIFT", "up"),
-        ("resizeactive", "0 -100")
+        ("movewindow", "u")
     ),
     KeyBind(
         (main_mod, "SHIFT", "down"),
-        ("resizeactive", "0 100")
+        ("movewindow", "d")
+    ),
+
+    KeyBind(
+        ("alt", "Shift" ,"left"),
+        ("resizeactive", "-30 0")
     ),
     KeyBind(
-        (main_mod, "G"),
+        ("alt", "Shift" ,"right"),
+        ("resizeactive", "30 0")
+    ),
+    KeyBind(
+        ("alt", "Shift" ,"up"),
+        ("resizeactive", "0 -30")
+    ),
+    KeyBind(
+        ("alt", "Shift" ,"down"),
+        ("resizeactive", "0 30")
+    ),
+    KeyBind(
+        (main_mod, "S"),
         "togglegroup",
         "Toggle group",
         Category.WINDOWS

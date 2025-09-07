@@ -8,7 +8,7 @@ key_binds = (
         Category.ACTIONS
     ),
     KeyBind(
-        (main_mod, "SHIFT", "S"),
+        ("","Print"),
         ("exec", "hypryouctl screenshot region"),
         "Screenshot",
         Category.ACTIONS
