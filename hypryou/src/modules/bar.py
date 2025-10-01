@@ -1,4 +1,4 @@
-from repository import gtk, gdk, pango, bluetooth
+from repository import gtk, gdk, pango, bluetooth, layer_shell, glib
 from dataclasses import dataclass
 from utils.ref import Ref
 from utils.styles import toggle_css_class
@@ -11,7 +11,7 @@ from config import Settings
 import weakref
 import cairo
 from src.services.network import get_network
-from src.services.state import toggle_window, open_settings
+from src.services.state import toggle_window, open_settings, _opened_windows
 from src.services.upower import get_upower, BatteryLevel, BatteryState
 from src.services.backlight import get_backlight_manager, BacklightDeviceView
 from src.services.clock import date, full_date, time
@@ -179,7 +179,7 @@ class Workspaces(gtk.Box):
                 button.set_visible(True)
 
 
-class Clock(gtk.Label):
+class Clock(gtk.Button):
     __gtype_name__ = "ClockApplet"
 
     def __init__(self) -> None:
@@ -196,6 +196,10 @@ class Clock(gtk.Label):
             # as it's updated after clock.date
             full_date: full_date.watch(self.update_date)
         }
+        self.handler = self.connect("clicked", self.on_click)
+
+    def on_click(self, *args: t.Any) -> None:
+        toggle_window("calendar")
 
     def update_time(self, new: str) -> None:
         self.set_label(new)
@@ -206,6 +210,7 @@ class Clock(gtk.Label):
         )
 
     def destroy(self) -> None:
+        self.disconnect(self.handler)
         for ref, handler_id in self.ref_handlers.items():
             ref.unwatch(handler_id)
 
@@ -712,10 +717,17 @@ class BrightnessApplet(Applet):
 class AudioApplet(Applet):
     __gtype_name__ = "AudioApplet"
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        icon: Ref[str] | str,
+        volume: Ref[float],
+        volume_muted: Ref[bool]
+    ) -> None:
+        self.volume = volume
+        self.volume_muted = volume_muted
         super().__init__(
             "volume",
-            audio.volume_icon,
+            icon,
             self.open_audio_menu,
             self.open_pavucontrol
         )
@@ -727,7 +739,7 @@ class AudioApplet(Applet):
         )
         self.add_controller(self.scroll)
 
-        self.volume_handler = audio.volume.watch(
+        self.volume_handler = self.volume.watch(
             self.update_tooltip
         )
         self.update_tooltip()
@@ -746,15 +758,15 @@ class AudioApplet(Applet):
         elif button_number == gdk.BUTTON_MIDDLE and self.on_wheel_click:
             self.on_wheel_click()
         elif button_number == gdk.BUTTON_SECONDARY:
-            audio.volume_muted.value = not audio.volume_muted.value
+            self.volume_muted.value = not self.volume_muted.value
 
     def update_tooltip(self, *args: t.Any) -> None:
-        self.set_tooltip_text(f"Volume: {int(audio.volume.value)}%")
+        self.set_tooltip_text(f"Volume: {int(self.volume.value)}%")
 
     def destroy(self) -> None:
         self.remove_controller(self.scroll)
         self.scroll.disconnect(self.scroll_handler)
-        audio.volume.unwatch(self.volume_handler)
+        self.volume.unwatch(self.volume_handler)
         super().destroy()
 
     def open_pavucontrol(self) -> None:
@@ -772,68 +784,36 @@ class AudioApplet(Applet):
         now = perf_counter()
         if self._last_scroll < now - 0.055:
             self._last_scroll = now
-            new = 5 * max(min(dy, 1), -1) * -1 + audio.volume.value
-            audio.volume.value = max(min(new, 100.0), 1.0)
+            new = 5 * max(min(dy, 1), -1) * -1 + self.volume.value
+            self.volume.value = max(min(new, 100.0), 1.0)
 
 
-class MicApplet(Applet):
+class MicApplet(AudioApplet):
     __gtype_name__ = "MicApplet"
 
     def __init__(self) -> None:
         super().__init__(
-            "microphone",
-            "mic_off",
-            self.open_mics_menu
+            audio.mic_icon,
+            audio.mic_volume,
+            audio.mic_muted
         )
 
         self.ref_handlers: dict[Ref[t.Any], int] = {
             audio.microphones: audio.microphones.watch(
                 self.on_mics_changed
-            ),
-            audio.mic_muted: audio.mic_muted.watch(
-                self.update_icon
-            ),
-            audio.recorders: audio.recorders.watch(
-                self.update_icon
             )
         }
         self.on_mics_changed(audio.microphones.value)
-        self.update_icon()
-
-    def update_icon(self, *args: t.Any) -> None:
-        muted = audio.mic_muted.value
-        is_recording = len(audio.recorders.value) > 0
-        if muted:
-            self.set_label("mic_off")
-        elif is_recording:
-            self.set_label("mic_double")
-        else:
-            self.set_label("mic")
 
     def on_mics_changed(self, new_list: set[t.Any]) -> None:
         self.set_visible(len(new_list) > 0)
-
-    def on_click_released(
-        self,
-        gesture: gtk.GestureClick,
-        n_press: int,
-        x: int,
-        y: int
-    ) -> None:
-        button_number = gesture.get_current_button()
-        if button_number == gdk.BUTTON_PRIMARY:
-            self.on_click()
-        elif button_number == gdk.BUTTON_MIDDLE and self.on_wheel_click:
-            self.on_wheel_click()
-        elif button_number == gdk.BUTTON_SECONDARY:
-            audio.mic_muted.value = not audio.mic_muted.value
 
     def destroy(self) -> None:
         for ref, handler in self.ref_handlers.items():
             ref.unwatch(handler)
         super().destroy()
 
-    def open_mics_menu(self) -> None:
+    def open_audio_menu(self) -> None:
         toggle_window("mics")
 
 
@@ -848,7 +828,11 @@ class Applets(gtk.Box):
 
         self.children = (
             MicApplet(),
-            AudioApplet(),
+            AudioApplet(
+                audio.volume_icon,
+                audio.volume,
+                audio.volume_muted
+            ),
             BluetoothApplet(),
             Applet(
                 "wifi",
@@ -867,119 +851,27 @@ class Applets(gtk.Box):
             self.remove(child)
 
 
-class OpenTray(gtk.Button):
-    __gtype_name__ = "OpenTrayButton"
+class OpenWindow(gtk.Button):
+    __gtype_name__ = "OpenWindowButton"
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        icon: str,
+        tooltip: str,
+        window_name: str,
+        css_classes: tuple[str, ...] = ()
+    ) -> None:
+        self.window_name = window_name
         super().__init__(
-            css_classes=("open-tray", "bar-applet"),
-            child=widget.Icon("browse"),
-            tooltip_text="System tray",
+            css_classes=css_classes,
+            child=widget.Icon(icon),
+            tooltip_text=tooltip,
             valign=gtk.Align.CENTER
         )
         self.conn_id = self.connect("clicked", self.on_clicked)
 
     def on_clicked(self, *args: t.Any) -> None:
-        toggle_window("tray")
-
-    def destroy(self) -> None:
-        self.disconnect(self.conn_id)
-
-
-class OpenCliphist(gtk.Button):
-    __gtype_name__ = "OpenCliphistButton"
-
-    def __init__(self) -> None:
-        super().__init__(
-            css_classes=("open-cliphist", "bar-applet"),
-            child=widget.Icon("content_paste"),
-            tooltip_text="Clipboard",
-            valign=gtk.Align.CENTER
-        )
-        self.conn_id = self.connect("clicked", self.on_clicked)
-
-    def on_clicked(self, *args: t.Any) -> None:
-        toggle_window("cliphist")
-
-    def destroy(self) -> None:
-        self.disconnect(self.conn_id)
-
-
-class OpenSidebar(gtk.Button):
-    __gtype_name__ = "OpenSidebarButton"
-
-    def __init__(self) -> None:
-        super().__init__(
-            css_classes=("open-sidebar", "icon-tonal"),
-            child=widget.Icon("space_dashboard"),
-            tooltip_text="Sidebar",
-            halign=gtk.Align.CENTER,
-            valign=gtk.Align.CENTER
-        )
-        self.conn_id = self.connect("clicked", self.on_clicked)
-
-    def on_clicked(self, *args: t.Any) -> None:
-        toggle_window("sidebar")
-
-    def destroy(self) -> None:
-        self.disconnect(self.conn_id)
-
-
-class OpenAppsMenu(gtk.Button):
-    __gtype_name__ = "OpenAppsMenuButton"
-
-    def __init__(self) -> None:
-        super().__init__(
-            css_classes=("open-apps-menu", "icon-tonal"),
-            child=widget.Icon("search"),
-            tooltip_text="Apps Menu",
-            halign=gtk.Align.CENTER,
-            valign=gtk.Align.CENTER
-        )
-        self.conn_id = self.connect("clicked", self.on_clicked)
-
-    def on_clicked(self, *args: t.Any) -> None:
-        toggle_window("apps_menu")
-
-    def destroy(self) -> None:
-        self.disconnect(self.conn_id)
-
-
-class OpenInfoMenu(gtk.Button):
-    __gtype_name__ = "OpenInfoMenuButton"
-
-    def __init__(self) -> None:
-        super().__init__(
-            css_classes=("open-info-menu", "icon-tonal"),
-            child=widget.Icon("info_i"),
-            tooltip_text="Info",
-            halign=gtk.Align.CENTER,
-            valign=gtk.Align.CENTER
-        )
-        self.conn_id = self.connect("clicked", self.on_clicked)
-
-    def on_clicked(self, *args: t.Any) -> None:
-        toggle_window("info")
-
-    def destroy(self) -> None:
-        self.disconnect(self.conn_id)
-
-
-class OpenClientsMenu(gtk.Button):
-    __gtype_name__ = "OpenClientsMenuButton"
-
-    def __init__(self) -> None:
-        super().__init__(
-            css_classes=("open-clients-menu", "icon-tonal"),
-            child=widget.Icon("ad_group"),
-            tooltip_text="Windows",
-            halign=gtk.Align.CENTER,
-            valign=gtk.Align.CENTER
-        )
-        self.conn_id = self.connect("clicked", self.on_clicked)
-
-    def on_clicked(self, *args: t.Any) -> None:
-        toggle_window("clients")
+        toggle_window(self.window_name)
 
     def destroy(self) -> None:
         self.disconnect(self.conn_id)
@@ -994,9 +886,24 @@ class ModulesLeft(gtk.Box):
             valign=gtk.Align.CENTER
         )
         self.children = (
-            OpenAppsMenu(),
-            OpenInfoMenu(),
-            OpenClientsMenu(),
+            OpenWindow(
+                "search",
+                "Apps Menu",
+                "apps_menu",
+                ("open-apps-menu", "icon-tonal")
+            ),
+            OpenWindow(
+                "info_i",
+                "Info",
+                "info",
+                ("open-info-menu", "icon-tonal")
+            ),
+            OpenWindow(
+                "ad_group",
+                "Windows",
+                "clients",
+                ("open-clients-menu", "icon-tonal")
+            ),
             Player(),
         )
         for child in self.children:
@@ -1039,11 +946,26 @@ class ModulesRight(gtk.Box):
         self.children = (
             KeyboardLayout(),
             Battery(),
-            OpenTray(),
-            OpenCliphist(),
+            OpenWindow(
+                "browse",
+                "System Tray",
+                "tray",
+                ("open-tray", "bar-applet")
+            ),
+            OpenWindow(
+                "content_paste",
+                "Clipboard",
+                "cliphist",
+                ("open-cliphist", "bar-applet")
+            ),
             Applets(),
             Clock(),
-            OpenSidebar()
+            OpenWindow(
+                "space_dashboard",
+                "Sidebar",
+                "sidebar",
+                ("open-sidebar", "icon-tonal")
+            )
         )
         for child in self.children:
             self.append(child)
@@ -1074,19 +996,65 @@ class Bar(widget.LayerWindow):
             exclusive=True,
             monitor=monitor,
             css_classes=("bar",),
-            name="bar"
+            name="bar",
+            layer=layer_shell.Layer.OVERLAY
         )
 
+        self.monitor = monitor
+        self.monitor_id = monitor_id
         self.center_box = gtk.CenterBox(
             start_widget=ModulesLeft(monitor_id),
             center_widget=ModulesCenter(monitor_id),
             end_widget=ModulesRight(monitor_id)
         )
 
+        self.ref_handlers: dict[Ref[t.Any], int] = {
+            hyprland.active_client: hyprland.active_client.watch(
+                self.update_hidden
+            ),
+            _opened_windows: _opened_windows.watch(self.update_hidden)
+        }
+        self.visible_timeout: int = -1
+
         self.set_child(self.center_box)
         self.show()
         if __debug__:
             weakref.finalize(self, lambda: logger.debug("Bar finalized"))
+
+    def update_hidden(self, *args: t.Any) -> None:
+        if self.visible_timeout != -1:
+            glib.source_remove(self.visible_timeout)
+            self.visible_timeout = -1
+
+        monitor_name = self.monitor.get_connector()
+        monitor_id = hyprland.monitor_ids.value.get(
+            monitor_name, self.monitor_id
+        )
+        active_client = hyprland.active_client.value.get(monitor_id)
+        set_visible = True
+        if (
+            len(_opened_windows.value) > 0
+            or active_client is None
+        ):
+            set_visible = True
+        else:
+            set_visible = not active_client.fullscreen
+
+        if set_visible is True:
+            self.set_visible(True)
+        else:
+            weak_self = weakref.ref(self)
+
+            def hide() -> None:
+                self = weak_self()
+                if not self:
+                    return
+                self.set_visible(False)
+                self.visible_timeout = -1
+
+            self.visible_timeout = glib.timeout_add(
+                250, hide
+            )
 
     def destroy(self) -> None:
         box = self.center_box
@@ -1104,6 +1072,8 @@ class Bar(widget.LayerWindow):
         box.set_end_widget(None)
         self.set_child(None)
         self.close()
+        for ref, handler in self.ref_handlers.items():
+            ref.unwatch(handler)
         super().destroy()
 
 

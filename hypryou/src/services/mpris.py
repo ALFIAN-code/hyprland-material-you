@@ -368,13 +368,21 @@ class MprisWatcher:
                 self.add_player(name)
 
     def scan_existing_players(self) -> None:
-        result = dbus_proxy.call_sync(
+        dbus_proxy.call(
             "ListNames",
             None,
             gio.DBusCallFlags.NONE,
             -1,
-            None
+            None,
+            self.scan_existing_players_finish
         )
+
+    def scan_existing_players_finish(
+        self,
+        proxy: gio.DBusProxy,
+        _result: gio.AsyncResult
+    ) -> None:
+        result = proxy.call_finish(_result)
         names = t.cast(list[str], result.unpack()[0])
         players = [name for name in names if name.startswith(MPRIS_PREFIX)]
         for name in players:
@@ -384,15 +392,25 @@ class MprisWatcher:
         if name in players.value:
             return
 
-        proxy = gio.DBusProxy.new_sync(
+        gio.DBusProxy.new(
             session_bus,
             gio.DBusProxyFlags.NONE,
             None,
             name,
             "/org/mpris/MediaPlayer2",
             "org.mpris.MediaPlayer2.Player",
-            None
+            None,
+            self.add_player_finish,
+            name
         )
+
+    def add_player_finish(
+        self,
+        proxy: gio.DBusProxy,
+        result: gio.AsyncResult,
+        name: str
+    ) -> None:
+        proxy.new_finish(result)
         player = MprisPlayer(proxy)
         players.value[name] = player
         if __debug__:
