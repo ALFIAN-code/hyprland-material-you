@@ -42,11 +42,13 @@ window.calendar {
     .date {
         font-size: 1rem;
         margin-left: 0.5rem;
+        color: $onSurface;
     }
 
     .weekdays {
         margin-bottom: 0.25rem;
         padding: 0.25rem;
+        color: $onSurface;
         :nth-child(6),
         :nth-child(7) {
             color: $onSurfaceVariant;
