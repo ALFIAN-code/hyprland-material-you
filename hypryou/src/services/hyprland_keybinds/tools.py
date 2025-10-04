@@ -1,12 +1,12 @@
 from src.services.hyprland_keybinds.common import KeyBind, main_mod, Category
 
 key_binds = (
-    KeyBind(
-        (main_mod, "Z"),
-        ("exec", "hypryouctl toggle_window players"),
-        "Players",
-        Category.TOOLS
-    ),
+    # KeyBind(
+    #     (main_mod, "Z"),
+    #     ("exec", "hypryouctl toggle_window players"),
+    #     "Players",
+    #     Category.TOOLS
+    # ),
     KeyBind(
         (main_mod, "period"),
         ("exec", "hypryouctl open_window emojis"),
@@ -41,12 +41,12 @@ key_binds = (
         "App Launcher",
         Category.TOOLS
     ),
-    KeyBind(
-        (main_mod, "W"),
-        ("exec", "hypryouctl toggle_window sidebar"),
-        "Sidebar",
-        Category.TOOLS
-    ),
+    # KeyBind(
+    #     (main_mod, "W"),
+    #     ("exec", "hypryouctl toggle_window sidebar"),
+    #     "Sidebar",
+    #     Category.TOOLS
+    # ),
     KeyBind(
         (main_mod, "A"),
         ("exec", "hypryouctl toggle_window clients"),
