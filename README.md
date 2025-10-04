@@ -81,6 +81,106 @@ HyprYou (hyprland-material-you v2). It aims to provide a modern, feature-rich, a
 
 </details>
 
+## Updating & Troubleshooting (jika perubahan lokal tidak muncul)
+
+Jika kamu mengubah kode lokal dan setelah `makepkg -si` perubahan tidak muncul di sistem, ikuti panduan ini supaya tidak perlu menghapus konfigurasi sistem setiap kali.
+
+1) Gunakan source lokal saat ingin build dari working tree
+
+- Edit `PKGBUILD` dan ubah `source` menjadi `git+file://$PWD`, serta naikkan `pkgrel` untuk memaksa paket baru:
+
+```bash
+# contoh bagian di PKGBUILD
+pkgver=2.1.4
+pkgrel=2
+source=("$_pkgname::git+file://$PWD")
+sha256sums('SKIP')
+```
+
+2) Bersihkan hasil build / clone lama sebelum membangun
+
+Jalankan dari folder yang berisi `PKGBUILD`:
+
+```bash
+rm -rf src/ pkg/ *.pkg.tar.* "${_pkgname}"*
+# commit snapshot lokal (opsional)
+git add .; and git commit -m "local snapshot"; or true
+```
+
+3) Hapus instalasi lama sementara (opsional, berguna untuk debugging)
+
+```bash
+sudo rm -rf /usr/lib/hypryou /usr/share/hypryou /usr/bin/hypryou* /usr/share/wayland-sessions/hypryou.desktop
+```
+
+4) Build & install paket baru
+
+```bash
+makepkg -si
+```
+
+5) Jika `makepkg` mengeluh bahwa folder bukan git repo
+
+- Pilih salah satu:
+
+  - Rename folder yang menghalangi supaya makepkg bisa clone remote:
+
+  ```bash
+  cd /home/alfian/alfianSpace/gitDownload
+  mv hyprland-material-you hyprland-material-you.bak
+  makepkg -si
+  ```
+
+  - Atur remote repository pada folder lokal jika folder tersebut memang git repo tapi remote berbeda:
+
+  ```bash
+  cd hyprland-material-you
+  git remote set-url origin https://github.com/ALFIAN-code/hyprland-material-you.git
+  cd ..
+  makepkg -si
+  ```
+
+  - Buat clone lokal yang pasti adalah repo git dan pakai itu sebagai source:
+
+  ```bash
+  git clone --local --no-hardlinks "$PWD" /tmp/hyprland-material-you-git
+  # lalu ubah PKGBUILD: source=("$_pkgname::git+file:///tmp/hyprland-material-you-git")
+  makepkg -si
+  ```
+
+6) Hapus cache Python yang mungkin menyebabkan kode lama masih dipakai
+
+```bash
+sudo find /usr/lib/hypryou -name '__pycache__' -exec rm -rf {} +; or true
+sudo find /usr/lib/hypryou -name '*.pyc' -delete
+```
+
+(Di dalam `PKGBUILD` kamu juga bisa tambahkan langkah menghapus `__pycache__`/`.pyc` di dalam `package()` sebelum menyalin file.)
+
+7) Cara cepat (tanpa paket) untuk menguji perubahan lokal
+
+```bash
+sudo rm -rf /usr/lib/hypryou
+sudo cp -a ./hypryou /usr/lib/hypryou
+```
+
+8) Verifikasi bahwa file yang terpasang sama dengan file lokal
+
+```bash
+md5sum /usr/lib/hypryou/src/services/hyprland_keybinds/workspaces.py \
+       ./hypryou/src/services/hyprland_keybinds/workspaces.py
+# atau tampilkan beberapa baris teratas
+head -n 40 /usr/lib/hypryou/src/services/hyprland_keybinds/workspaces.py
+head -n 40 ./hypryou/src/services/hyprland_keybinds/workspaces.py
+```
+
+Catatan penting
+
+- Kamu tidak perlu menghapus konfigurasi sistem setiap update. Yang perlu dipastikan adalah paket baru benar-benar berisi perubahanmu.
+- Naikkan `pkgrel` ketika membangun ulang dari source lokal agar package manager mengenali versi baru.
+- Bersihkan folder `src/`/cache dan `.pyc` jika perubahan tidak muncul.
+- Jika masih ada masalah, lampirkan output `makepkg -si` (khususnya langkah clone/copy) dan hasil `md5sum`/`head` seperti di atas agar bisa ditelaah lebih lanjut.
+
 ## Thanks to
 
 - All people from my discord server
