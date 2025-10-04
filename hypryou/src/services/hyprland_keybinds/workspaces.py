@@ -1,5 +1,5 @@
 from src.services.hyprland_keybinds.common import (
-    KeyBindHint, main_mod, Category
+    KeyBindHint, KeyBind,main_mod, Category
 )
 
 key_binds = (
@@ -18,24 +18,24 @@ key_binds = (
         "Switch to empty workspace",
         Category.WORKSPACES
     ),
-    KeyBindHint(
+    KeyBind(
         (main_mod, "Shift", "S"),
-        "movetoworkspacesilent", "special",
+        ("movetoworkspacesilent", "special"),
         Category.WINDOWS
     ),
-    KeyBindHint(
+    KeyBind(
         (main_mod, "S"),
-        "exec", "hyprctl dispatch togglespecialworkspace",
+        ("exec", "hyprctl dispatch togglespecialworkspace"),
         Category.WINDOWS
     ),
-    KeyBindHint(
+    KeyBind(
         (main_mod, "Z"),
-        "workspace", "-1",
+        ("workspace", "-1"),
         Category.TOOLS
     ),
-    KeyBindHint(
+    KeyBind(
         (main_mod, "X"),
-        "workspace", "+1",
+        ("workspace", "+1"),
         Category.TOOLS
     ),
 )
