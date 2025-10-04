@@ -50,27 +50,10 @@ key_binds = (
         "resizewindow"
     ),
     KeyBind(
-        ("shift", "ALT", "right"),
-        ("resizeactive", "10 0")
-    ),
-    KeyBind(
-        ("shift", "ALT", "left"),
-        ("resizeactive", "-10 0")
-    ),
-    KeyBind(
-        ("shift", "ALT", "up"),
-        ("resizeactive", "0 -10")
-    ),
-    KeyBind(
-        ("shift", "ALT", "down"),
-        ("resizeactive", "0 10")
-    ),
-    KeyBind(
         (main_mod, "TAB"),
         "cyclenext",
         Category.WINDOWS
     ),
-
     KeyBind(
         (main_mod, "shift", "left"),
         ("movewindow", "l"),
