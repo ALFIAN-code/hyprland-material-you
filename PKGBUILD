@@ -5,10 +5,10 @@ pkgver=2.1.4
 pkgrel=1
 pkgdesc="Dynamic and elegant desktop setup inspired by Material You, featuring auto-generated colors, fluid animations, and customizable user experience."
 arch=('x86_64')
-url="https://github.com/koeqaife/hyprland-material-you"
+url="https://github.com/ALFIAN-code/hyprland-material-you"
 install=hypryou.install
 license=('GPL3')
-source=("$_pkgname::git+https://github.com/koeqaife/hyprland-material-you.git")
+source=("$_pkgname::git+https://github.com/ALFIAN-code/hyprland-material-you.git")
 sha256sums=('SKIP')
 
 depends=(
