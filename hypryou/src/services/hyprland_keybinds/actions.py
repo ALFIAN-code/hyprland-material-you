@@ -8,19 +8,19 @@ key_binds = (
         Category.ACTIONS
     ),
     KeyBind(
-        (main_mod, "SHIFT", "S"),
+        ("", "Print"),
         ("exec", "hypryouctl screenshot region freeze"),
         "Screenshot",
         Category.ACTIONS
     ),
     KeyBind(
-        (main_mod, "CTRL", "S"),
+        ("SHIFT", "Print"),
         ("exec", "hypryouctl screenshot window freeze"),
         "Screenshot of window",
         Category.ACTIONS
     ),
     KeyBind(
-        (main_mod, "ALT", "S"),
+        ("ALT", "Print"),
         ("exec", "hypryouctl screenshot active freeze"),
         "Screenshot of active screen",
         Category.ACTIONS

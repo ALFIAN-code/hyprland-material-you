@@ -1,8 +1,8 @@
 # Maintainer: Koeqaife
 pkgname=hypryou
 _pkgname=hyprland-material-you
-pkgver=2.1.4
-pkgrel=1
+pkgver=2.1.5
+pkgrel=2
 pkgdesc="Dynamic and elegant desktop setup inspired by Material You, featuring auto-generated colors, fluid animations, and customizable user experience."
 arch=('x86_64')
 url="https://github.com/ALFIAN-code/hyprland-material-you"

@@ -50,19 +50,19 @@ key_binds = (
         "resizewindow"
     ),
     KeyBind(
-        (main_mod, "ALT", "right"),
+        ("shift", "ALT", "right"),
         ("resizeactive", "10 0")
     ),
     KeyBind(
-        (main_mod, "ALT", "left"),
+        ("shift", "ALT", "left"),
         ("resizeactive", "-10 0")
     ),
     KeyBind(
-        (main_mod, "ALT", "up"),
+        ("shift", "ALT", "up"),
         ("resizeactive", "0 -10")
     ),
     KeyBind(
-        (main_mod, "ALT", "down"),
+        ("shift", "ALT", "down"),
         ("resizeactive", "0 10")
     ),
     KeyBind(
@@ -72,23 +72,23 @@ key_binds = (
     ),
 
     KeyBind(
-        (main_mod, "left"),
+        (main_mod, "shift", "left"),
         ("movewindow", "l"),
         Category.WINDOWS
     ),
     KeyBind(
-        (main_mod, "right"),
+        (main_mod, "shift", "right"),
         ("movewindow", "r"),
         Category.WINDOWS
     ),
     KeyBind(
-        (main_mod, "up"),
+        (main_mod, "shift", "up"),
         ("movewindow", "u"),
         "Move window up",
         Category.WINDOWS
     ),
     KeyBind(
-        (main_mod, "down"),
+        (main_mod, "shift", "down"),
         ("movewindow", "d"),
         Category.WINDOWS
     ),

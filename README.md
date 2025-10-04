@@ -174,6 +174,13 @@ head -n 40 /usr/lib/hypryou/src/services/hyprland_keybinds/workspaces.py
 head -n 40 ./hypryou/src/services/hyprland_keybinds/workspaces.py
 ```
 
+
+atau hapus files
+```bash
+sudo rm -rf /usr/lib/hypryou /usr/share/hypryou /usr/bin/hypryou* /usr/share/wayland-sessions/hypryou.desktop 
+
+```
+
 Catatan penting
 
 - Kamu tidak perlu menghapus konfigurasi sistem setiap update. Yang perlu dipastikan adalah paket baru benar-benar berisi perubahanmu.
