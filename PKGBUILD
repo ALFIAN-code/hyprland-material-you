@@ -9,6 +9,7 @@ url="https://github.com/ALFIAN-code/hyprland-material-you"
 install=hypryou.install
 license=('GPL3')
 source=("$_pkgname::git+https://github.com/ALFIAN-code/hyprland-material-you.git")
+# source=("$_pkgname::git+file://$PWD")
 sha256sums=('SKIP')
 
 depends=(

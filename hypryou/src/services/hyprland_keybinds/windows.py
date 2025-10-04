@@ -14,7 +14,7 @@ key_binds = (
         Category.WINDOWS
     ),
     KeyBind(
-        (main_mod, "T"),
+        (main_mod, "W"),
         "togglefloating",
         "Toggle floating mode",
         Category.WINDOWS
@@ -50,59 +50,54 @@ key_binds = (
         "resizewindow"
     ),
     KeyBind(
+        (main_mod, "ALT", "right"),
+        ("resizeactive", "10 0")
+    ),
+    KeyBind(
+        (main_mod, "ALT", "left"),
+        ("resizeactive", "-10 0")
+    ),
+    KeyBind(
+        (main_mod, "ALT", "up"),
+        ("resizeactive", "0 -10")
+    ),
+    KeyBind(
+        (main_mod, "ALT", "down"),
+        ("resizeactive", "0 10")
+    ),
+    KeyBind(
+        (main_mod, "TAB"),
+        "cyclenext",
+        Category.WINDOWS
+    ),
+
+    KeyBind(
         (main_mod, "left"),
-        ("movefocus", "l")
+        ("movewindow", "l"),
+        Category.WINDOWS
     ),
     KeyBind(
         (main_mod, "right"),
-        ("movefocus", "r")
+        ("movewindow", "r"),
+        Category.WINDOWS
     ),
     KeyBind(
         (main_mod, "up"),
-        ("movefocus", "u")
+        ("movewindow", "u"),
+        "Move window up",
+        Category.WINDOWS
     ),
     KeyBind(
         (main_mod, "down"),
-        ("movefocus", "d")
-    ),
-
-    KeyBind(
-        (main_mod, "SHIFT", "right"),
-        ("movewindow", "r")
-    ),
-    KeyBind(
-        (main_mod, "SHIFT", "left"),
-        ("movewindow", "l")
-    ),
-    KeyBind(
-        (main_mod, "SHIFT", "up"),
-        ("movewindow", "u")
-    ),
-    KeyBind(
-        (main_mod, "SHIFT", "down"),
-        ("movewindow", "d")
-    ),
-
-    KeyBind(
-        ("alt", "Shift" ,"left"),
-        ("resizeactive", "-30 0")
-    ),
-    KeyBind(
-        ("alt", "Shift" ,"right"),
-        ("resizeactive", "30 0")
-    ),
-    KeyBind(
-        ("alt", "Shift" ,"up"),
-        ("resizeactive", "0 -30")
-    ),
-    KeyBind(
-        ("alt", "Shift" ,"down"),
-        ("resizeactive", "0 30")
+        ("movewindow", "d"),
+        Category.WINDOWS
     ),
     KeyBind(
         (main_mod, "G"),
         "togglegroup",
         "Toggle group",
         Category.WINDOWS
-    )
+    ),
+
+
 )

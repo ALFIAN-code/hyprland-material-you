@@ -20,26 +20,22 @@ key_binds = (
     ),
     KeyBindHint(
         (main_mod, "Shift", "S"),
-        ("movetoworkspacesilent", "special"),
-        "Move to Special workspace",
+        "movetoworkspacesilent", "special",
         Category.WINDOWS
     ),
     KeyBindHint(
         (main_mod, "S"),
-        ("exec", "hyprctl dispatch togglespecialworkspace"),
-        "Special workspace",
+        "exec", "hyprctl dispatch togglespecialworkspace",
         Category.WINDOWS
     ),
     KeyBindHint(
         (main_mod, "Z"),
-        ("workspace", "-1"),
-        "Players",
+        "workspace", "-1",
         Category.TOOLS
     ),
     KeyBindHint(
         (main_mod, "X"),
-        ("workspace", "+1"),
-        "Players",
+        "workspace", "+1",
         Category.TOOLS
     ),
 )
