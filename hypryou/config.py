@@ -128,7 +128,7 @@ default_settings: dict[str, t.Any] = {
     # Hyprland
     "hyprland.gaps_in": 5,
     "hyprland.gaps_out": 12,
-    "hyprland.border_size": 0,
+    "hyprland.border_size": 3,
     "hyprland.layout": "dwindle",
     "hyprland.decoration.rounding": 16,
     "hyprland.decoration.rounding_power": 2.0,
