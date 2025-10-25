@@ -25,6 +25,8 @@ noanim_layers = [
 ]
 
 BLUR = """
+exec-once = nwg-look -a
+
 decoration {{
     dim_special = 0.5
     blur {{
