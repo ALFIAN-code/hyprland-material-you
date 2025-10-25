@@ -39,7 +39,7 @@ depends=(
   'python-cairo'
   'networkmanager'
   'hyprshot'
-
+  'nwg-look'
   'gtk4-layer-shell'
   'python-materialyoucolor-git'
   'libastal-bluetooth-git'
